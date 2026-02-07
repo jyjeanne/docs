@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-    id 'io.github.jyjeanne.dita-ot-gradle' version '2.8.3'
+    id 'io.github.jyjeanne.dita-ot-gradle' version '2.8.4'
 }
 
 import org.gradle.api.DefaultTask
@@ -190,6 +190,7 @@ task pdf(type: DitaOtTask, dependsOn: autoGenerate) {
     output outputDir
     transtype 'pdf'
     filter "${projectDirPath}/resources/pdf.ditaval"
+    showWarnings false
 
     ditaProperties.put('args.chapter.layout', 'BASIC')
     ditaProperties.put('args.gen.task.lbl', 'YES')
@@ -206,6 +207,7 @@ task html(type: DitaOtTask, dependsOn: autoGenerate) {
     output outputDir
     transtype 'html5'
     filter "${projectDirPath}/resources/html.ditaval"
+    showWarnings false
 
     ditaProperties.put('args.copycss', 'yes')
     ditaProperties.put('args.css', 'dita-ot-doc.css')
@@ -226,6 +228,7 @@ task htmlhelp(type: DitaOtTask, dependsOn: autoGenerate) {
     output outputDir
     transtype 'htmlhelp'
     filter ditavalFile
+    showWarnings false
 
     ditaProperties.put('args.copycss', 'yes')
     ditaProperties.put('args.css', 'dita-ot-doc.css')
@@ -279,6 +282,7 @@ task site(type: DitaOtTask) {
     output getPropertyOrDefault('outputDir', layout.buildDirectory.dir("site").get().asFile.path)
     filter "${projectDirPath}/resources/site.ditaval"
     transtype 'org.dita-ot.html'
+    showWarnings false
 
     // Evaluate the noCommitMeta flag at configuration time
     def includeCommitMeta = !providers.gradleProperty('noCommitMeta').map { Boolean.parseBoolean(it) }.getOrElse(false)
