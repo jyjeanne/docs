@@ -57,6 +57,9 @@
       <relcell>
         <topicref keyref="markdown-input"/>
       </relcell>
+      <relcell>
+        <topicref keyref="format-comparison"/>
+      </relcell>
     </relrow>
   </reltable>
 </map>
