@@ -1,0 +1,44 @@
+# CI matrix for the sample DITA-OT plugin.
+# To use it, copy this file to .github/workflows/ in the plugin repository, next to build.gradle.kts.
+# Each matrix entry downloads one DITA-OT version, installs the plugin into it,
+# runs the transformation, and checks links.
+
+name: DITA-OT plugin matrix
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  dita-ot-matrix:
+    name: DITA-OT ${{ matrix.dita-ot-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        dita-ot-version:
+          - '4.2.3'
+          - '4.4.2'
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download DITA-OT, install plugin, transform and check links
+        run: ./gradlew dev -PditaOtVersion=${{ matrix.dita-ot-version }} --no-daemon
+
+      - name: Upload output and plugin package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sample-html5-dita-ot-${{ matrix.dita-ot-version }}
+          path: |
+            build/output/sample-html5-${{ matrix.dita-ot-version }}/
+            build/plugin/*.zip
+          if-no-files-found: warn

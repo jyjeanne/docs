@@ -57,6 +57,7 @@
       <subjectdef keys="language-java"/>
       <subjectdef keys="language-javascript"/>
       <subjectdef keys="language-json"/>
+      <subjectdef keys="language-kotlin"/>
       <subjectdef keys="language-markdown"/>
       <subjectdef keys="language-markup"/>
       <subjectdef keys="language-mathml"/>

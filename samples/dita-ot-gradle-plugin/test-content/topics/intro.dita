@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<concept id="intro">
+  <title>Introduction</title>
+  <shortdesc>This topic is used by the sample plug-in regression tests.</shortdesc>
+  <conbody>
+    <p>The sample plug-in adds the <codeph>sample-html5</codeph> transformation type. See
+      <xref href="usage.dita"/> for usage.</p>
+  </conbody>
+</concept>

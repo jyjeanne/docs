@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <target name="dita2sample-html5" depends="dita2sample-html5.init,
+                dita2html5"/>
+  <target name="dita2sample-html5.init">
+    <property name="args.cssroot" location="${dita.plugin.com.example.sample-html5.dir}/css"/>
+    <property name="args.css" value="sample.css"/>
+    <property name="args.copycss" value="yes"/>
+    <property name="args.csspath" value="css"/>
+  </target>
+</project>

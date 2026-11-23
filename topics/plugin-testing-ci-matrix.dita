@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<task id="plugin-testing-ci-matrix">
+  <title>Testing plug-ins against several DITA-OT versions</title>
+  <titlealts>
+    <navtitle>Testing across DITA-OT versions</navtitle>
+  </titlealts>
+  <shortdesc>A continuous integration (CI) matrix runs the same plug-in tests once for each DITA-OT version that the
+    plug-in supports. With the Gradle build from <xref keyref="plugin-testing-gradle"/>, each entry in the matrix
+    passes a different DITA-OT version to the build.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins
+          <indexterm>continuous integration</indexterm></indexterm>
+        <indexterm>GitHub Actions
+          <indexterm>testing plug-ins</indexterm></indexterm>
+        <indexterm>Gradle
+          <indexterm>CI matrix</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq>
+      <p>A Gradle build that tests the plug-in, such as the sample in <xref keyref="plugin-testing-gradle"/>, in a
+        repository on GitHub.</p>
+    </prereq>
+    <context>
+      <p>A plug-in that works on one DITA-OT release can fail on another, for example when a core template or parameter
+        changes. Testing every supported version on each change shows which versions a change breaks. It also shows
+        whether the plug-in works with a new release before you announce support for it.</p>
+      <p>This example uses <xref keyref="github-actions"/>. Other CI systems can run the same Gradle command.</p>
+    </context>
+    <steps>
+      <step>
+        <cmd>In <filepath>build.gradle.kts</filepath>, read the DITA-OT version from a Gradle property, with a default
+          for local builds.</cmd>
+        <stepxmp>
+          <codeblock
+            outputclass="language-kotlin"
+          >val ditaOtVersion: String = providers.gradleProperty("ditaOtVersion").getOrElse("4.4.2")
+val ditaOtHome = layout.buildDirectory.dir("dita-ot/dita-ot-$ditaOtVersion")</codeblock>
+          <p>The sample build uses <codeph>ditaOtVersion</codeph> in three places: the version that
+              <codeph>downloadDitaOt</codeph> downloads, the installation that <codeph>installPlugin</codeph> and
+              <codeph>validateDita</codeph> use, and the output directory of <codeph>buildSampleHtml5</codeph>.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Include the DITA-OT version in the output directory of each transformation task.</cmd>
+        <stepxmp>
+          <codeblock
+            outputclass="language-kotlin"
+          >output(layout.buildDirectory.dir("output/sample-html5-$ditaOtVersion").get().asFile.path)</codeblock>
+        </stepxmp>
+        <info>
+          <p>If two versions write to the same output directory, Gradle can consider the second transformation up to
+            date and skip it. The build then reports success for a version that it did not test.</p>
+        </info>
+      </step>
+      <step>
+        <cmd>Run the build locally for two versions, to confirm that the version is passed through.</cmd>
+        <stepxmp>
+          <codeblock outputclass="syntax-bash">./gradlew dev -PditaOtVersion=4.2.3
+./gradlew dev -PditaOtVersion=4.4.2</codeblock>
+        </stepxmp>
+        <stepresult>
+          <p>The <filepath>build/output</filepath> directory contains one output directory for each version.</p>
+        </stepresult>
+      </step>
+      <step>
+        <cmd>Add a workflow file to the <filepath
+          >.github/workflows</filepath> directory of the plug-in repository.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample workflow: <filepath>dita-ot-matrix.yml</filepath></title>
+            <codeblock outputclass="language-yaml normalize-space show-line-numbers show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/ci/dita-ot-matrix.yml"
+              /></codeblock>
+          </fig>
+          <p>In this workflow:</p>
+          <ul>
+            <li><codeph>strategy.matrix.dita-ot-version</codeph> lists the DITA-OT versions to test. GitHub starts one
+              job for each value.</li>
+            <li><codeph>fail-fast: false</codeph> lets the other versions finish when one fails, so that you see all
+              the failing versions at once.</li>
+            <li>The <codeph>run</codeph> step passes the version to Gradle with
+                <codeph>-PditaOtVersion=${{ matrix.dita-ot-version }}</codeph>.</li>
+            <li>The last step uploads the output and the plug-in ZIP file for each version, even when the tests fail,
+              so that you can inspect them.</li>
+          </ul>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Edit the <codeph>dita-ot-version</codeph> list to match the DITA-OT versions that your plug-in
+          supports.</cmd>
+        <info>
+          <p>Each value must be a released DITA-OT version number, such as <codeph>4.4.2</codeph>.</p>
+        </info>
+      </step>
+      <step>
+        <cmd>Commit and push the workflow.</cmd>
+        <stepresult>
+          <p>The workflow runs on each push and pull request. In the <uicontrol>Actions</uicontrol> tab of the
+            repository, each DITA-OT version appears as a separate job, named after the version.</p>
+        </stepresult>
+      </step>
+    </steps>
+    <postreq>
+      <p>When a new DITA-OT version is released, add it to the matrix before you announce support for it. Remove a
+        version when you stop supporting it. See <xref keyref="plugin-upgrading"/>.</p>
+    </postreq>
+  </taskbody>
+</task>

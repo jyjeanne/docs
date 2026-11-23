@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://www.dita-ot.org/rng/plugin.rnc" type="application/relax-ng-compact-syntax"?>
+<plugin id="com.example.sample-html5">
+  <require plugin="org.dita.html5"/>
+  <transtype name="sample-html5" extends="html5" desc="HTML5 with sample CSS"/>
+  <feature extension="ant.import" file="build_sample-html5.xml"/>
+</plugin>

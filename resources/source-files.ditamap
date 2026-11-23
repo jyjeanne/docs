@@ -154,6 +154,7 @@
   <keydef keys="plugin-extension-points-support" href="../extension-points/plugin-extension-points-support.dita"/>
   <keydef keys="plugin-extension-points-xslt-import" href="../extension-points/plugin-extension-points-xslt-import.dita"/>
   <keydef keys="plugin-extension-points-xslt-parameters" href="../extension-points/plugin-extension-points-xslt-parameters.dita"/>
+  <keydef keys="plugin-gradle-tasks" href="../topics/plugin-gradle-tasks.dita"/>
   <keydef keys="plugin-implement-saxon-collation-uri-resolvers" href="../topics/implement-saxon-collation-uri-resolvers.dita"/>
   <keydef keys="plugin-implement-saxon-customizations" href="../topics/implement-saxon-customizations.dita"/>
   <keydef keys="plugin-implement-saxon-extension-functions" href="../topics/implement-saxon-extension-functions.dita"/>
@@ -166,6 +167,10 @@
   <keydef keys="plugin-properties-file" href="../parameters/plugin-properties-file.dita"/>
   <keydef keys="plugin-rewrite-rules" href="../topics/plugin-rewrite-rules.dita"/>
   <keydef keys="plugin-set-parameters" href="../topics/plugin-set-parameters.dita"/>
+  <keydef keys="plugin-testing" href="../topics/plugin-testing.dita"/>
+  <keydef keys="plugin-testing-ci-matrix" href="../topics/plugin-testing-ci-matrix.dita"/>
+  <keydef keys="plugin-testing-gradle" href="../topics/plugin-testing-gradle.dita"/>
+  <keydef keys="plugin-upgrading" href="../topics/plugin-upgrading.dita"/>
   <keydef keys="plugin-use-cases" href="../topics/plugin-use-cases.dita"/>
   <keydef keys="plugin-xmlcatalog" href="../topics/plugin-xmlcatalog.dita"/>
   <keydef keys="plugin-xsltparams" href="../topics/plugin-xsltparams.dita"/>

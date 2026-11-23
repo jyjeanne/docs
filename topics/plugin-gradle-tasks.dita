@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DITA Reference//EN" "reference.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<reference id="plugin-gradle-tasks">
+  <title>Gradle task types for DITA-OT</title>
+  <titlealts>
+    <navtitle>Gradle task types</navtitle>
+  </titlealts>
+  <shortdesc>The <xref keyref="dita-ot-gradle-plugin"/> Gradle plugin provides five task types for DITA-OT. This
+    reference lists their main properties and default values in version 2.8.8 of the Gradle plugin.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Gradle
+          <indexterm>task types</indexterm></indexterm>
+        <indexterm><codeph>DitaOtDownloadTask</codeph></indexterm>
+        <indexterm><codeph>DitaOtInstallPluginTask</codeph></indexterm>
+        <indexterm><codeph>DitaOtValidateTask</codeph></indexterm>
+        <indexterm><codeph>DitaLinkCheckTask</codeph></indexterm>
+        <indexterm><codeph>DitaOtTask</codeph></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <refbody>
+    <section id="using">
+      <title>Using the task types</title>
+      <p>Apply the Gradle plugin in <filepath>build.gradle.kts</filepath>, import the task types from the
+          <codeph>com.github.jyjeanne</codeph> package, and register a task for each step of your build:</p>
+      <codeblock outputclass="language-kotlin">import com.github.jyjeanne.DitaOtDownloadTask
+
+plugins {
+    id("io.github.jyjeanne.dita-ot-gradle") version "2.8.8"
+}
+
+val downloadDitaOt by tasks.registering(DitaOtDownloadTask::class) {
+    version.set("4.4.2")
+}</codeblock>
+      <p>Set properties with <codeph>set()</codeph>. Some task types also have shorter methods, such as
+          <codeph>input()</codeph>, <codeph>ditaOt()</codeph>, <codeph>transtype()</codeph> and
+          <codeph>filter()</codeph>. The tables below give the method name where one exists. For a complete example,
+        see <xref keyref="plugin-testing-gradle"/>.</p>
+      <p>The Gradle plugin is maintained outside the DITA-OT project. For other versions, and for properties not listed
+        here, see the <xref keyref="dita-ot-gradle-plugin"/> documentation.</p>
+    </section>
+    <section id="DitaOtDownloadTask">
+      <title><codeph>DitaOtDownloadTask</codeph></title>
+      <p>Downloads a DITA-OT distribution and extracts it to
+          <filepath><varname>destinationDir</varname>/dita-ot-<varname>version</varname></filepath>. Downloaded archives
+        are cached in the <filepath>.dita-ot/cache</filepath> directory in your home directory.</p>
+      <simpletable keycol="1">
+        <sthead>
+          <stentry>Property</stentry>
+          <stentry>Default</stentry>
+          <stentry>Description</stentry>
+        </sthead>
+        <strow>
+          <stentry><codeph>version</codeph></stentry>
+          <stentry><codeph>4.2.3</codeph></stentry>
+          <stentry>DITA-OT version to download. Set it explicitly, so that the build does not change when the default
+            changes.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>destinationDir</codeph></stentry>
+          <stentry><filepath>build/dita-ot</filepath></stentry>
+          <stentry>Directory to extract the distribution to.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>skipIfExists</codeph></stentry>
+          <stentry><codeph>true</codeph></stentry>
+          <stentry>Skip the download when the version is already extracted.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>checksum</codeph></stentry>
+          <stentry>(none)</stentry>
+          <stentry>Expected checksum of the downloaded archive.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>downloadUrl</codeph></stentry>
+          <stentry>(none)</stentry>
+          <stentry>URL to download the distribution from, instead of the default location.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>retries</codeph></stentry>
+          <stentry><codeph>3</codeph></stentry>
+          <stentry>Number of download attempts after a failure.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>connectTimeout</codeph>, <codeph>readTimeout</codeph></stentry>
+          <stentry><codeph>30000</codeph>, <codeph>60000</codeph></stentry>
+          <stentry>Network timeouts, in milliseconds.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>quiet</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Reduce progress output.</stentry>
+        </strow>
+      </simpletable>
+    </section>
+    <section id="DitaOtInstallPluginTask">
+      <title><codeph>DitaOtInstallPluginTask</codeph></title>
+      <p>Installs one or more DITA-OT plug-ins with the <cmdname>dita install</cmdname> subcommand of a DITA-OT
+        installation.</p>
+      <simpletable keycol="1">
+        <sthead>
+          <stentry>Property</stentry>
+          <stentry>Default</stentry>
+          <stentry>Description</stentry>
+        </sthead>
+        <strow>
+          <stentry><codeph>ditaOtDir</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>DITA-OT installation directory.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>plugins</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>Plug-ins to install: plug-in IDs from the registry, URLs, ZIP files or directories. The
+              <codeph>plugin()</codeph> method adds one entry.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>force</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Replace a plug-in that is already installed. Set it to <codeph>true</codeph> when a build installs
+            the plug-in you are developing.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>failOnError</codeph></stentry>
+          <stentry><codeph>true</codeph></stentry>
+          <stentry>Fail the build when an installation fails.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>retries</codeph></stentry>
+          <stentry><codeph>0</codeph></stentry>
+          <stentry>Number of installation attempts after a failure.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>quiet</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Reduce progress output.</stentry>
+        </strow>
+      </simpletable>
+    </section>
+    <section id="DitaOtValidateTask">
+      <title><codeph>DitaOtValidateTask</codeph></title>
+      <p>Validates DITA maps and topics with a DITA-OT installation, without running a full transformation.</p>
+      <simpletable keycol="1">
+        <sthead>
+          <stentry>Property</stentry>
+          <stentry>Default</stentry>
+          <stentry>Description</stentry>
+        </sthead>
+        <strow>
+          <stentry><codeph>ditaOtDir</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>DITA-OT installation directory.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>inputFiles</codeph>, <codeph>input()</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>Maps or topics to validate.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>filterFile</codeph>, <codeph>filter()</codeph></stentry>
+          <stentry>(none)</stentry>
+          <stentry>DITAVAL file to apply.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>processingMode</codeph></stentry>
+          <stentry><codeph>strict</codeph></stentry>
+          <stentry>DITA-OT processing mode: <option>strict</option>, <option>lax</option> or
+            <option>skip</option>.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>strictMode</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Fail the build on warnings as well as errors.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>failOnError</codeph></stentry>
+          <stentry><codeph>true</codeph></stentry>
+          <stentry>Fail the build when validation errors are found.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>validationTimeout</codeph></stentry>
+          <stentry><codeph>600000</codeph></stentry>
+          <stentry>Timeout, in milliseconds.</stentry>
+        </strow>
+      </simpletable>
+    </section>
+    <section id="DitaLinkCheckTask">
+      <title><codeph>DitaLinkCheckTask</codeph></title>
+      <p>Checks the links in DITA maps and topics, and fails the build when a link is broken. It reads the source files
+        directly and does not need a DITA-OT installation. According to the Gradle plugin documentation, links that use
+        keys (<xmlatt>keyref</xmlatt> and <xmlatt>conkeyref</xmlatt>) are not checked.</p>
+      <simpletable keycol="1">
+        <sthead>
+          <stentry>Property</stentry>
+          <stentry>Default</stentry>
+          <stentry>Description</stentry>
+        </sthead>
+        <strow>
+          <stentry><codeph>inputFiles</codeph>, <codeph>input()</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>Maps or topics to check.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>failOnBroken</codeph></stentry>
+          <stentry><codeph>true</codeph></stentry>
+          <stentry>Fail the build when a broken link is found.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>recursive</codeph></stentry>
+          <stentry><codeph>true</codeph></stentry>
+          <stentry>Follow references from maps to the topics and maps they refer to.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>checkExternal</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Also check external URLs. This makes the check depend on the network.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>excludeUrlPatterns</codeph>, <codeph>excludeUrl()</codeph></stentry>
+          <stentry>(empty)</stentry>
+          <stentry>URL patterns to skip when <codeph>checkExternal</codeph> is set.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>connectTimeout</codeph>, <codeph>readTimeout</codeph></stentry>
+          <stentry><codeph>5000</codeph>, <codeph>10000</codeph></stentry>
+          <stentry>Timeouts for external URLs, in milliseconds.</stentry>
+        </strow>
+      </simpletable>
+    </section>
+    <section id="DitaOtTask">
+      <title><codeph>DitaOtTask</codeph></title>
+      <p>Runs a DITA-OT transformation. The Gradle plugin also registers a default task of this type, named
+          <codeph>dita</codeph>.</p>
+      <simpletable keycol="1">
+        <sthead>
+          <stentry>Property or method</stentry>
+          <stentry>Default</stentry>
+          <stentry>Description</stentry>
+        </sthead>
+        <strow>
+          <stentry><codeph>ditaOt()</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>DITA-OT installation directory.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>input()</codeph></stentry>
+          <stentry>(required)</stentry>
+          <stentry>Map or topic to transform.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>output()</codeph></stentry>
+          <stentry><filepath>build</filepath></stentry>
+          <stentry>Output directory, as a path string.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>transtype()</codeph></stentry>
+          <stentry><option>html5</option></stentry>
+          <stentry>One or more transformation types.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>filter()</codeph></stentry>
+          <stentry>(none)</stentry>
+          <stentry>DITAVAL file to apply.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>ditaProperties</codeph></stentry>
+          <stentry>(empty)</stentry>
+          <stentry>DITA-OT parameters, for example
+              <codeph>ditaProperties.put("args.gen.task.lbl", "YES")</codeph>. See
+            <xref keyref="parameters"/>.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>singleOutputDir</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Write the output of several inputs to one directory.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>useAssociatedFilter</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Apply a DITAVAL file that has the same name as the input file.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>showProgress</codeph>, <codeph>progressStyle</codeph></stentry>
+          <stentry><codeph>true</codeph>, <codeph>DETAILED</codeph></stentry>
+          <stentry>Progress display. The Gradle plugin documents the styles <codeph>DETAILED</codeph>,
+              <codeph>SIMPLE</codeph>, <codeph>MINIMAL</codeph> and <codeph>QUIET</codeph>.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>showWarnings</codeph></stentry>
+          <stentry><codeph>false</codeph></stentry>
+          <stentry>Show DITA-OT warnings in the build output.</stentry>
+        </strow>
+        <strow>
+          <stentry><codeph>ditaProcessTimeoutMinutes</codeph></stentry>
+          <stentry><codeph>30</codeph></stentry>
+          <stentry>Timeout for the transformation, in minutes.</stentry>
+        </strow>
+      </simpletable>
+    </section>
+  </refbody>
+</reference>

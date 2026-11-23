@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<task id="usage">
+  <title>Using the sample transformation</title>
+  <shortdesc>Run the Gradle task that produces HTML5 output with the sample CSS.</shortdesc>
+  <taskbody>
+    <steps>
+      <step>
+        <cmd>Run <userinput>./gradlew buildSampleHtml5</userinput>.</cmd>
+      </step>
+      <step>
+        <cmd>Open the generated <filepath>index.html</filepath>.</cmd>
+      </step>
+    </steps>
+  </taskbody>
+</task>

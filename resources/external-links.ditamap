@@ -986,6 +986,36 @@
       </topicmeta>
     </keydef>
     <keydef
+      keys="gradle-wrapper"
+      href="https://docs.gradle.org/current/userguide/gradle_wrapper.html"
+      scope="external"
+      format="html"
+    >
+      <topicmeta>
+        <linktext>Gradle Wrapper</linktext>
+      </topicmeta>
+    </keydef>
+    <keydef
+      keys="dita-ot-gradle-plugin"
+      href="https://github.com/jyjeanne/dita-ot-gradle"
+      scope="external"
+      format="html"
+    >
+      <topicmeta>
+        <linktext><codeph>io.github.jyjeanne.dita-ot-gradle</codeph></linktext>
+      </topicmeta>
+    </keydef>
+    <keydef
+      keys="dita-ot-gradle-plugin-portal"
+      href="https://plugins.gradle.org/plugin/io.github.jyjeanne.dita-ot-gradle"
+      scope="external"
+      format="html"
+    >
+      <topicmeta>
+        <linktext>Gradle Plugin Portal</linktext>
+      </topicmeta>
+    </keydef>
+    <keydef
       keys="homebrew"
       href="https://brew.sh"
       scope="external"

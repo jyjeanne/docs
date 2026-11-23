@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<concept id="plugin-upgrading">
+  <title>Maintaining and upgrading plug-ins</title>
+  <titlealts>
+    <navtitle>Upgrading plug-ins</navtitle>
+  </titlealts>
+  <shortdesc>A plug-in that uses the DITA-OT extension mechanism can usually move to a new DITA-OT release with little
+    work. Automated tests, small overrides and a record of what you changed make each upgrade faster and
+    safer.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins
+          <indexterm>upgrading</indexterm></indexterm>
+        <indexterm>plug-ins
+          <indexterm>maintenance</indexterm></indexterm>
+        <indexterm>upgrading
+          <indexterm>plug-ins</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <section id="upgrade-checklist">
+      <title>Upgrade checklist</title>
+      <p>When a new DITA-OT release is available:</p>
+      <ol>
+        <li>Read the release notes and the <xref keyref="migration"/> topic for the release. Note any changes to
+          templates, attribute sets, parameters or extension points that your plug-in uses.</li>
+        <li>Test the plug-in with the new release:
+          <ul>
+            <li>If you use a CI matrix, add the new version to it, as described in
+              <xref keyref="plugin-testing-ci-matrix"/>. With the Gradle build from
+              <xref keyref="plugin-testing-gradle"/>, you can also run the tests locally with
+                <codeph>./gradlew dev -PditaOtVersion=<varname>version</varname></codeph>.</li>
+            <li>Otherwise, install the plug-in into a clean installation of the new release with
+                <cmdname>dita install</cmdname>, check that its transformation types appear in the output of
+                <cmdname>dita transtypes</cmdname>, and run your test transformations.</li>
+          </ul></li>
+        <li>Compare the output with the output of the previous release, and review the differences.</li>
+        <li>Update the overrides that no longer match the core code. Check that the <xmlelement>require</xmlelement>
+          dependencies in <filepath>plugin.xml</filepath> still resolve, as described in
+          <xref keyref="plugin-dependencies"/>.</li>
+        <li>Publish a new plug-in release, and state which DITA-OT versions it has been tested with.</li>
+      </ol>
+      <note type="tip">To replace a version of your plug-in that is already installed, add the
+          <parmname>--force</parmname> option: <cmdname>dita install</cmdname> <varname>plug-in-zip</varname>
+          <parmname>--force</parmname>.</note>
+    </section>
+    <section id="upgrade-keep-overrides-small">
+      <title>Keep overrides small</title>
+      <p>Most upgrade problems come from copies of core code. Override only the templates and attribute sets you need,
+        as described in <xref keyref="plugin-coding-conventions"/>. Small overrides are easier to compare with the core
+        code, and fewer of them can break when the core changes.</p>
+    </section>
+    <section id="upgrade-version-control">
+      <title>Track changes to core code</title>
+      <p>If your plug-in copies or overrides core files, record which DITA-OT version each copy came from. When you
+        upgrade, compare the new core file with the recorded version to see which of your changes still apply.</p>
+    </section>
+    <section id="upgrade-supported-versions">
+      <title>Decide which versions to support</title>
+      <p>Each supported DITA-OT version is another version to test. Keep the list short, and keep it in one place,
+        such as the matrix in your CI workflow, so that the versions you test and the versions you document as supported
+        stay the same. When you stop supporting a version, remove it from the matrix and from the documentation.</p>
+    </section>
+    <section id="upgrade-distribution">
+      <title>Distribute the plug-in</title>
+      <p>Package only the plug-in files, in the standard plug-in structure, so that users can install the ZIP file with
+        one command. Keep test content and build files out of the package. See
+        <xref keyref="plugin-testing"/> for a project layout that separates them. Keep a changelog, so that users can
+        see what changed between releases.</p>
+    </section>
+  </conbody>
+</concept>

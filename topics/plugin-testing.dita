@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<concept id="plugin-testing">
+  <title>Testing plug-ins</title>
+  <shortdesc>A plug-in changes how DITA-OT processes content, so a change that looks correct on its own can break the
+    output. Testing a plug-in means installing it into a clean DITA-OT installation, running its transformations on
+    known test content, and checking the results.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>plug-ins
+          <indexterm>testing</indexterm></indexterm>
+        <indexterm>plug-ins
+          <indexterm>project structure</indexterm></indexterm>
+        <indexterm>testing
+          <indexterm>plug-ins</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <conbody>
+    <p>Plug-ins depend on parts of DITA-OT that change between releases, such as XSLT templates, Ant targets,
+      parameters and extension points. Tests that run the plug-in in a real DITA-OT installation find these problems
+      before your users do, and make it safer to change the plug-in or move it to a new DITA-OT release.</p>
+    <section id="project-structure">
+      <title>Organizing a plug-in project</title>
+      <p>Keep the plug-in, its test content and its build files in one source repository, but package and install only
+        the plug-in files. A project for a plug-in that adds an HTML5-based transformation type can look like this:</p>
+      <codeblock>dita-ot-gradle-plugin
+├── plugin.xml                Plug-in configuration file
+├── build_sample-html5.xml    Ant script for the transformation type
+├── css
+│   └── sample.css            Resources used by the plug-in
+├── test-content              Test maps and topics
+│   ├── sample.ditamap
+│   └── topics
+│       ├── intro.dita
+│       └── usage.dita
+├── build.gradle.kts          Build script that installs and tests the plug-in
+├── settings.gradle.kts
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── gradle
+│   └── wrapper
+└── ci
+    └── dita-ot-matrix.yml    Continuous integration workflow</codeblock>
+      <p>The files fall into three groups:</p>
+      <dl>
+        <dlentry>
+          <dt>Plug-in files</dt>
+          <dd>The <filepath>plugin.xml</filepath> file and the files it refers to, such as Ant scripts, XSLT
+            stylesheets, CSS and language files. These are the only files in the plug-in ZIP file that users install.
+            See <xref keyref="plugin-configfile"/>.</dd>
+        </dlentry>
+        <dlentry>
+          <dt>Test content</dt>
+          <dd>DITA maps and topics that exercise the features of the plug-in. They stay in the repository and are not
+            installed.</dd>
+        </dlentry>
+        <dlentry>
+          <dt>Build and CI files</dt>
+          <dd>Scripts that download DITA-OT, install the plug-in, run the tests, and run them again in continuous
+            integration (CI). The example above uses a <keyword keyref="gradle"/> build, described in
+            <xref keyref="plugin-testing-gradle"/>.</dd>
+        </dlentry>
+      </dl>
+      <p>This layout follows the advice in <xref keyref="plugin-coding-conventions"/> to store plug-in source code
+        outside the DITA-OT installation directory.</p>
+    </section>
+    <section id="test-levels">
+      <title>Levels of testing</title>
+      <p>A plug-in test strategy usually covers three levels. Each level rules out a cause of failure before you look at
+        the next one.</p>
+      <dl>
+        <dlentry>
+          <dt>Input validation</dt>
+          <dd>Confirm that the test content is valid DITA, so that a failure points to the plug-in and not to the
+            content. Use the <cmdname>dita validate</cmdname> subcommand described in
+            <xref keyref="dita-command-arguments"/>.</dd>
+        </dlentry>
+        <dlentry>
+          <dt>Installation</dt>
+          <dd>Confirm that the plug-in installs into a clean DITA-OT installation, as described in
+            <xref keyref="plugins-installing"/>, and that its transformation type appears in the output of
+            <cmdname>dita transtypes</cmdname>.</dd>
+        </dlentry>
+        <dlentry>
+          <dt>Transformation and output</dt>
+          <dd>Run the plug-in's transformation on the test content and check the result. Most regressions appear at
+            this level.</dd>
+        </dlentry>
+      </dl>
+    </section>
+    <section id="test-content">
+      <title>Choosing test content</title>
+      <p>Cover the cases that your plug-in handles, for example:</p>
+      <ul>
+        <li>A simple map with a few topics</li>
+        <li>Nested maps and topic references</li>
+        <li>Cross-references, key references and content references</li>
+        <li>Images and other resources</li>
+        <li>Conditional processing with a DITAVAL file</li>
+        <li>Special characters, and empty or optional elements</li>
+      </ul>
+      <p>A small set of maps under version control gives you a regression suite that is easy to run and to
+        diagnose.</p>
+    </section>
+    <section id="test-commands">
+      <title>Testing from the command line</title>
+      <p>To test a plug-in by hand, install it and run its transformation with the <cmdname>dita</cmdname>
+        command:</p>
+      <codeblock outputclass="syntax-bash"><filepath conkeyref="conref-task/dita-cmd"/> <cmdname
+        >install</cmdname> <varname>com.example.sample-html5.zip</varname>
+<filepath conkeyref="conref-task/dita-cmd"/> <parmname>--input</parmname>=<filepath
+        >test-content/sample.ditamap</filepath> <parmname>--format</parmname>=<option>sample-html5</option> <parmname
+        >--output</parmname>=<filepath>out/sample-html5</filepath></codeblock>
+      <p>Use <parmname>--filter</parmname> to apply a DITAVAL file, and <parmname>--verbose</parmname> or
+          <parmname>--debug</parmname> to get more detail when a test fails.</p>
+    </section>
+    <section id="test-output">
+      <title>Checking the output</title>
+      <p>A transformation that finishes without errors does not prove that the output is correct. Check the result, for
+        example by:</p>
+      <ul>
+        <li>Confirming that the expected files exist</li>
+        <li>Checking that generated XML or HTML is well-formed</li>
+        <li>Comparing the output with a known-good baseline and reviewing the differences</li>
+        <li>Checking links in the content and in the generated output</li>
+      </ul>
+    </section>
+    <section id="test-automation">
+      <title>Automating tests</title>
+      <p>Manual tests are easy to skip. A build tool can run the install, validate, transform and check steps with one
+        command, on every change. <xref keyref="plugin-testing-gradle"/> shows a complete example that uses Gradle.</p>
+      <p>Run the same tests against each DITA-OT version that your plug-in supports. A plug-in that works on one release
+        can fail on another when core templates or parameters change. See
+        <xref keyref="plugin-testing-ci-matrix"/>.</p>
+    </section>
+  </conbody>
+</concept>

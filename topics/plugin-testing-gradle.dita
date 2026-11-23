@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE task PUBLIC "-//OASIS//DTD DITA Task//EN" "task.dtd">
+<!--  This file is part of the DITA Open Toolkit project. See the accompanying LICENSE file for applicable license.  -->
+<task id="plugin-testing-gradle">
+  <title>Testing plug-ins with Gradle</title>
+  <titlealts>
+    <navtitle>Testing with Gradle</navtitle>
+  </titlealts>
+  <shortdesc>The <xref keyref="dita-ot-gradle-plugin"/> Gradle plugin provides tasks that download DITA-OT, install
+    plug-ins, validate DITA content, run transformations and check links. A <keyword keyref="gradle"/> build can chain
+    these tasks, so that one command tests a plug-in in a clean DITA-OT installation.</shortdesc>
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>Gradle
+          <indexterm>testing plug-ins</indexterm></indexterm>
+        <indexterm>plug-ins
+          <indexterm>testing</indexterm>
+          <indexterm>Gradle</indexterm></indexterm>
+        <indexterm>testing
+          <indexterm>Gradle</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+  <taskbody>
+    <prereq>
+      <ul>
+        <li>Java 17 or later, which the Gradle wrapper in this example (Gradle 9) requires.</li>
+        <li>You do not need to install Gradle or DITA-OT. The <xref keyref="gradle-wrapper"/> downloads Gradle, and the
+          build downloads DITA-OT.</li>
+      </ul>
+    </prereq>
+    <context>
+      <p>This scenario builds a small plug-in (<codeph>com.example.sample-html5</codeph>) that adds the
+          <option>sample-html5</option> transformation type, an HTML5 transformation with a custom stylesheet. It then
+        adds a Gradle build that tests the plug-in.</p>
+      <p>Two kinds of plug-in are involved, and their names are similar:</p>
+      <ul>
+        <li>The <b>DITA-OT plug-in</b> is the code you are developing. DITA-OT installs and runs it.</li>
+        <li>The <b>Gradle plugin</b> (<codeph>io.github.jyjeanne.dita-ot-gradle</codeph>) adds DITA-OT task types to
+          Gradle. It only runs in the build, and it is not part of the DITA-OT plug-in.</li>
+      </ul>
+      <note>The Gradle plugin is an open-source project (Apache License 2.0) that is maintained outside the DITA-OT
+        project. It is published on the <xref keyref="dita-ot-gradle-plugin-portal"/>. This example uses version 2.8.8.
+        The build script for the DITA-OT documentation also uses this Gradle plugin.</note>
+    </context>
+    <steps>
+      <step>
+        <cmd>Create a project directory named <filepath>dita-ot-gradle-plugin</filepath>, and add a plug-in
+          configuration file (<filepath>plugin.xml</filepath>) that declares the new transformation type.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>plugin.xml</filepath> file</title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/plugin.xml"
+              /></codeblock>
+          </fig>
+          <p>The plug-in extends the default HTML5 transformation, so the <xmlelement>require</xmlelement> element
+            declares <filepath>org.dita.html5</filepath> as a dependency.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Add the Ant script (<filepath>build_sample-html5.xml</filepath>) that defines the transformation type, and
+          a <filepath>css/sample.css</filepath> stylesheet.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample build file: <filepath>build_sample-html5.xml</filepath></title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/build_sample-html5.xml"
+              /></codeblock>
+          </fig>
+          <p>The script sets the same four CSS parameters as the plug-in in
+            <xref keyref="html-customization-plugin-bundle-css"/>.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Add test content in a <filepath>test-content</filepath> subdirectory.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample test map: <filepath>test-content/sample.ditamap</filepath></title>
+            <codeblock outputclass="language-xml normalize-space show-line-numbers show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/test-content/sample.ditamap"
+              /></codeblock>
+          </fig>
+          <p>The topics in <filepath>test-content/topics</filepath> contain a cross-reference, so that the link check
+            has something to check. For a real plug-in, add content for each feature that the plug-in handles.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Add the Gradle wrapper and a <filepath>settings.gradle.kts</filepath> file that names the project.</cmd>
+        <info>
+          <p>Copy <filepath>gradlew</filepath>, <filepath>gradlew.bat</filepath> and the
+              <filepath>gradle/wrapper</filepath> directory from the sample, or, if Gradle is installed, generate them
+            with <cmdname>gradle wrapper</cmdname>.</p>
+        </info>
+        <stepxmp>
+          <fig>
+            <title>Sample <filepath>settings.gradle.kts</filepath> file</title>
+            <codeblock outputclass="language-kotlin normalize-space show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/settings.gradle.kts"
+              /></codeblock>
+          </fig>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>Add a build script (<filepath>build.gradle.kts</filepath>) that applies the Gradle plugin and registers
+          the tasks that test the plug-in.</cmd>
+        <stepxmp>
+          <fig>
+            <title>Sample build script: <filepath>build.gradle.kts</filepath></title>
+            <codeblock outputclass="language-kotlin normalize-space show-line-numbers show-whitespace"><coderef
+                href="../samples/dita-ot-gradle-plugin/build.gradle.kts"
+              /></codeblock>
+          </fig>
+          <p>The build script registers these tasks:</p>
+          <simpletable keycol="1">
+            <sthead>
+              <stentry>Task</stentry>
+              <stentry>Task type</stentry>
+              <stentry>What it does</stentry>
+            </sthead>
+            <strow>
+              <stentry><codeph>downloadDitaOt</codeph></stentry>
+              <stentry><codeph>DitaOtDownloadTask</codeph></stentry>
+              <stentry>Downloads the DITA-OT version given by the <codeph>ditaOtVersion</codeph> property and extracts
+                it to <filepath>build/dita-ot/dita-ot-<varname>version</varname></filepath>.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>packagePlugin</codeph></stentry>
+              <stentry><codeph>Zip</codeph> (Gradle)</stentry>
+              <stentry>Packages the plug-in files, and only those files, as
+                  <filepath>build/plugin/com.example.sample-html5.zip</filepath>.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>installPlugin</codeph></stentry>
+              <stentry><codeph>DitaOtInstallPluginTask</codeph></stentry>
+              <stentry>Installs the ZIP file into the downloaded DITA-OT. The <codeph>force</codeph> property replaces
+                an installation left by an earlier build.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>validateDita</codeph></stentry>
+              <stentry><codeph>DitaOtValidateTask</codeph></stentry>
+              <stentry>Validates the test content with the downloaded DITA-OT, without running a full
+                transformation.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>checkLinks</codeph></stentry>
+              <stentry><codeph>DitaLinkCheckTask</codeph></stentry>
+              <stentry>Checks the links in the test content and fails the build if a link is broken. It reads the
+                source files and does not need DITA-OT.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>buildSampleHtml5</codeph></stentry>
+              <stentry><codeph>DitaOtTask</codeph></stentry>
+              <stentry>Transforms the test content with the <option>sample-html5</option> transformation type that the
+                plug-in installs.</stentry>
+            </strow>
+            <strow>
+              <stentry><codeph>dev</codeph></stentry>
+              <stentry>(aggregate)</stentry>
+              <stentry>Runs all of the tasks above in dependency order.</stentry>
+            </strow>
+          </simpletable>
+          <p>The task names come from the build script. Only the task types come from the Gradle plugin, which also
+            registers a default task named <codeph>dita</codeph> of type <codeph>DitaOtTask</codeph>. For the
+            properties of each task type, see <xref keyref="plugin-gradle-tasks"/>.</p>
+        </stepxmp>
+      </step>
+      <step>
+        <cmd>From the project directory, run the <codeph>dev</codeph> task.</cmd>
+        <choicetable>
+          <chrow platform="unix">
+            <choption>Linux or macOS&#xA0;</choption>
+            <chdesc><codeblock outputclass="syntax-bash multi-platform">./gradlew dev</codeblock></chdesc>
+          </chrow>
+          <chrow platform="windows">
+            <choption>Windows</choption>
+            <chdesc><codeblock outputclass="syntax-bash multi-platform">gradlew.bat dev</codeblock></chdesc>
+          </chrow>
+        </choicetable>
+        <info>
+          <p>To test against another DITA-OT version, add <codeph>-PditaOtVersion=<varname>version</varname></codeph>,
+            for example <codeph>./gradlew dev -PditaOtVersion=4.2.3</codeph>.</p>
+          <note type="important">With version 2.8.8 of the Gradle plugin on Windows, the plug-in installation fails if
+            the path of the project directory contains spaces. Move the project to a path without spaces, or map it
+            to a drive letter with the <cmdname>subst</cmdname> command and run the build from that drive.</note>
+        </info>
+        <stepresult>
+          <p>Gradle validates the test content, checks its links, packages and installs the plug-in, and runs the
+            transformation. Downloaded DITA-OT archives are cached in the <filepath>.dita-ot/cache</filepath> directory
+            in your home directory. A DITA-OT version that is already extracted is not downloaded again.</p>
+        </stepresult>
+      </step>
+    </steps>
+    <result>
+      <note type="tip">The files for this sample project are included in the DITA-OT installation directory under
+          <filepath>docsrc/samples/dita-ot-gradle-plugin/</filepath> and on
+        <xref
+          href="https://github.com/dita-ot/docs/tree/develop/samples/dita-ot-gradle-plugin"
+          format="html"
+          scope="external"
+        >GitHub</xref>.</note>
+      <p>The generated HTML5 output is in <filepath>build/output/sample-html5-<varname>version</varname></filepath>,
+        with the sample stylesheet in its <filepath>css</filepath> subdirectory. The project has the following
+        layout:</p>
+      <codeblock>dita-ot-gradle-plugin
+├── build.gradle.kts
+├── build_sample-html5.xml
+├── ci
+│   └── dita-ot-matrix.yml
+├── css
+│   └── sample.css
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradle.properties
+├── gradlew
+├── gradlew.bat
+├── plugin.xml
+├── settings.gradle.kts
+└── test-content
+    ├── sample.ditamap
+    └── topics
+        ├── intro.dita
+        └── usage.dita</codeblock>
+    </result>
+    <postreq>
+      <p>To run the same tests for each DITA-OT version that your plug-in supports, see
+        <xref keyref="plugin-testing-ci-matrix"/>.</p>
+    </postreq>
+  </taskbody>
+</task>

@@ -7,6 +7,12 @@
   <topicref keyref="plugin-benefits"/>
   <topicref keyref="plugin-configfile"/>
   <topicref keyref="plugin-coding-conventions"/>
+  <topicref keyref="plugin-testing">
+    <topicref keyref="plugin-testing-gradle"/>
+    <topicref keyref="plugin-testing-ci-matrix"/>
+    <topicref keyref="plugin-gradle-tasks"/>
+  </topicref>
+  <topicref keyref="plugin-upgrading"/>
   <topicref keyref="plugin-dependencies">
     <topicref keyref="referencing-other-plugins"/>
   </topicref>
